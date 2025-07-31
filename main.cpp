@@ -7,7 +7,7 @@
 int main(void)
 {
     // To Python
-    std::ofstream file("../output/interarrival.csv");
+    std::ofstream interarrivalFile("../output/interarrival.csv");
 
     // Sim Tick units of seconds.
     unsigned long simTick = 0;
@@ -20,15 +20,25 @@ int main(void)
     double arrivaleRate = 40.0 / 3600.0;
     std::unique_ptr<GenPacket> pGenPack = std::make_unique<GenPacket>(arrivaleRate);
 
+    pGenPack->generateNextSendTime();
     // I want to do a simTick driven method.
     // 10 hours
     while(simTick++ < 60*10*60)
     {
-        double interarrival = pGenPack->sampleExponential();
-        std::cout << "interGenPacket: " << interarrival << std::endl;
-        file << interarrival << "\n";
+        if(pGenPack->attemptEvent(simTick))
+        {
+            pServer->receivePacket(pGenPack->sendPacket(), simTick);
+        }
+        // Work on processing the queue in the server at certain sim ticks
+
+
+        // interarrivalFile << interarrival << "\n";
     }
-    file.close();
+
+
+
+    
+    interarrivalFile.close();
     
 
 

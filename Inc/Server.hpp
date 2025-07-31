@@ -7,7 +7,7 @@ class Server
 {
     private:
         double serviceRate_;
-        std::queue<int> queue_;
+        std::queue<Packet> queue_;
         int systemArrivals_;
         int serviceCompletions_;
         double avgSystemTime_;
@@ -21,7 +21,7 @@ class Server
         ~Server();
         Server(double rate);
 
-        double processPacket(const Packet& pkt) const;
+        double receivePacket(const Packet& pkt, const int tick);
 
         int getSystemArrivals(void) const { return systemArrivals_; }
         int getServiveCompletions(void) const { return serviceCompletions_; }

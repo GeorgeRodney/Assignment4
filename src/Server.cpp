@@ -30,8 +30,9 @@ Server::Server(double rate)
 {
 }
 
-double Server::processPacket(const Packet& pkt) const
+double Server::processPacket(const Packet& pkt, const int tick)
 {
+    queue_.push(pkt);
     return 0.0;
 }
 
