@@ -1,29 +1,34 @@
 #include "GenPacket.hpp"
+#include <fstream>
 
 GenPacket::GenPacket()
 : packetGenRate_(1.0)
-, rng_()
 , expDist_(packetGenRate_)
-, nextPackGenTime_(0)
+, uniqueIdFactory_(0)
 {
 }
 
 GenPacket::~GenPacket()
 {
+    if(interArrivalHist.is_open()) interArrivalHist.close();
 }
 
-GenPacket::GenPacket(double rate)
+GenPacket::GenPacket(const double rate, const std::string& str)
 : packetGenRate_(rate)
-, rng_()
 , expDist_(packetGenRate_)
-, nextPackGenTime_(0)
 {
-
+    interArrivalHist.open(str);
+    if (!interArrivalHist.is_open())
+    {
+        throw std::runtime_error("interServiceHist not open");
+    }
 }
 
 int GenPacket::sampleExponential(void)
 {
-    return static_cast<int>(std::ceil(expDist_(rng_)));
+    int inter = static_cast<int>(std::ceil(expDist_(rng_)));
+    interArrivalHist << inter << "\n";
+    return inter;
 }
 
 void GenPacket::generateNextSendTime(void)
@@ -36,6 +41,7 @@ bool GenPacket::attemptEvent(const int tick)
     if (tick >= nextPackGenTime_)
     {
         nextPackGenTime_ = tick;
+        generateNextSendTime();
         return true;
     }
     else 
@@ -44,8 +50,9 @@ bool GenPacket::attemptEvent(const int tick)
     }
 }
 
-Packet GenPacket::sendPacket(void) const
+Packet GenPacket::sendPacket(void)
 {
     Packet pk{};
+    pk.setId(uniqueIdFactory_++);
     return pk;
 }

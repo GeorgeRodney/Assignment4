@@ -1,13 +1,17 @@
 #pragma once
-#include <vector>
 
 class Packet
 {
     private:
-        std::vector<double> packetInfo_;
+        int id_;
+        int startTime_;
+
     public:
         Packet();
         ~Packet();
 
-        std::vector<double> getPacketInfo(void) const { return packetInfo_; }
+        void setId(const int id);
+        void setQueueStartTime(const int time);
+
+        const int getQueueStartTime(void) const { return startTime_; }
 };
